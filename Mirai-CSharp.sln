@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mirai-CSharp", "Mirai-CShar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mirai-CSharp.Example", "Mirai-CSharp.Example\Mirai-CSharp.Example.csproj", "{833A64B1-B2C0-45B3-BC16-297F139A6C1B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mirai_GameWiki", "Mirai-Maplestory\Mirai_GameWiki.csproj", "{DEEA47C4-E858-482D-A1A2-01C064C9C86A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mirai_GameWiki", "Mirai-GameWiki\Mirai_GameWiki.csproj", "{D52AE2D3-E507-4790-BBDC-2D361654278F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{833A64B1-B2C0-45B3-BC16-297F139A6C1B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{833A64B1-B2C0-45B3-BC16-297F139A6C1B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{833A64B1-B2C0-45B3-BC16-297F139A6C1B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DEEA47C4-E858-482D-A1A2-01C064C9C86A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DEEA47C4-E858-482D-A1A2-01C064C9C86A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DEEA47C4-E858-482D-A1A2-01C064C9C86A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DEEA47C4-E858-482D-A1A2-01C064C9C86A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D52AE2D3-E507-4790-BBDC-2D361654278F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D52AE2D3-E507-4790-BBDC-2D361654278F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D52AE2D3-E507-4790-BBDC-2D361654278F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D52AE2D3-E507-4790-BBDC-2D361654278F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

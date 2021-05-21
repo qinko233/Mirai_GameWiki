@@ -3,6 +3,8 @@ using Mirai_CSharp;
 using Mirai_CSharp.Extensions;
 using Mirai_CSharp.Models;
 using Mirai_CSharp.Plugin.Interfaces;
+using Mirai_GameWiki.Infrastructure;
+using Mirai_GameWiki.Model;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
@@ -37,7 +39,8 @@ namespace Mirai_GameWiki.Plugin
                 if (e.Chain.Length > 1)
                 {
                     bool isReply = false, isAtSource = false;
-                    IMessageBuilder builder = GetReplyMsg(e, ref isReply, ref isAtSource);
+                    IMessageBuilder builder = new MessageBuilder();
+                    ReplyMessage(e.Chain, builder, e.Sender.Id, ref isReply);
                     if (isReply)//是否回复消息
                     {
                         if (isAtSource)//是否@消息源
@@ -65,7 +68,8 @@ namespace Mirai_GameWiki.Plugin
                 if (e.Chain.Length > 1)
                 {
                     bool isReply = false, isAtSource = false;
-                    IMessageBuilder builder = GetReplyMsg(e, ref isReply, ref isAtSource);
+                    IMessageBuilder builder = new MessageBuilder();
+                    ReplyMessage(e.Chain, builder, e.Sender.Id, ref isReply);
                     if (isReply)//是否回复消息
                     {
                         if (isAtSource)//是否@消息源
@@ -87,166 +91,86 @@ namespace Mirai_GameWiki.Plugin
         }
 
         /// <summary>
-        /// 回复消息
+        /// Q&A
         /// </summary>
-        /// <param name="message">消息链[0]是消息主键,[1]开始是具体消息</param>
-        /// <param name="isReply">是否回复消息</param>
-        /// <param name="isAtSource">是否引用来源消息</param>
-        /// <returns></returns>
-        public IMessageBuilder GetReplyMsg(IGroupMessageEventArgs messageEvent, ref bool isReply, ref bool isAtSource)
+        /// <param name="message"></param>
+        /// <param name="builder"></param>
+        /// <param name="senderId"></param>
+        /// <param name="isReply"></param>
+        public void ReplyMessage(IMessageBase[] message, IMessageBuilder builder, long senderId, ref bool isReply)
         {
             isReply = true;
-            isAtSource = false;
-            IMessageBuilder builder = new MessageBuilder();
-            var message = messageEvent.Chain;
-
-            if (message.Length > 1)
+            var firstMsg = Convert.ToString(message[1]);
+            //Type:Source、Plain、Face、Image
+            switch (message[1].Type)
             {
-                var firstMsg = Convert.ToString(message[1]);
-                //Type:Source、Plain、Face、Image
-                switch (message[1].Type)
-                {
-                    case PlainMessage.MsgType:
-                        #region 1.定义正则表达式
-                        var getWikiReg = new Regex($"(?<=(^{GetJsonValue("BotName")}\\s+))([^(\\s)]+)$");//机器人名 词条名
-                        var setWikiReg = new Regex($"(?<=(^{GetJsonValue("WikiCommand:Add")}\\s+))([^(\\s)]+)$");//添加词条 词条名
-                        var removeWikiReg = new Regex($"(?<=(^{GetJsonValue("WikiCommand:Remove")}\\s+))([^(\\s)]+)$");//删除词条 词条名
-                        #endregion
+                case PlainMessage.MsgType:
+                    #region 1.定义正则表达式
+                    var getWikiReg = new Regex($"(?<=(^{_command["BotName"]}\\s+))([^(\\s)]+)$");//机器人名 词条名
+                    var setWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Add"]}\\s+))([^(\\s)]+)$");//添加词条 词条名
+                    var removeWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Remove"]}\\s+))([^(\\s)]+)$");//删除词条 词条名
+                    var warframe_sortie = new Regex(_command["WarframeApi:sortie:regex"]);//warframe 突击
+                    #endregion
 
-                        #region 2.1查百科
-                        if (getWikiReg.IsMatch(firstMsg))
+                    #region 2.1查百科
+                    if (getWikiReg.IsMatch(firstMsg))
+                    {
+                        var question = getWikiReg.Match(firstMsg).Value;//词条的关键词
+                        GetWiki(question, builder);
+                    }
+                    #endregion
+                    #region 2.2添加词条关键词
+                    else if (setWikiReg.IsMatch(firstMsg))
+                    {
+                        var question = setWikiReg.Match(firstMsg).Value;
+                        if (!listenCache.ContainsKey(senderId))
                         {
-                            var question = getWikiReg.Match(firstMsg).Value;//词条的关键词
-                            GetWiki(question, builder);
+                            listenCache.Add(senderId, question);
                         }
-                        #endregion
-                        #region 2.2添加词条关键词
-                        else if (setWikiReg.IsMatch(firstMsg))
+                    }
+                    #endregion
+                    #region 2.3删除词条
+                    else if (removeWikiReg.IsMatch(firstMsg))
+                    {
+                        var question = removeWikiReg.Match(firstMsg).Value;
+                        builder.AddPlainMessage(RemoveWiki(question));
+                    }
+                    #endregion
+                    #region warframe突击
+                    else if (warframe_sortie.IsMatch(firstMsg))
+                    {
+                        var url = _command["WarframeApi:Host"] + _command["WarframeApi:sortie:api"];
+                        var result = JsonConvert.DeserializeObject<SortieModel>(HttpHelper.Send(url, "get"));
+                        int i = 1;
+                        builder.AddPlainMessage($"阵营：{result.faction}\r\n");
+                        result.variants.ForEach(m =>
                         {
-                            var question = setWikiReg.Match(firstMsg).Value;
-                            if (!listenCache.ContainsKey(messageEvent.Sender.Id))
-                            {
-                                listenCache.Add(messageEvent.Sender.Id, question);
-                            }
-                        }
-                        #endregion
-                        #region 2.3删除词条
-                        else if (removeWikiReg.IsMatch(firstMsg))
-                        {
-                            var question = removeWikiReg.Match(firstMsg).Value;
-                            builder.AddPlainMessage(RemoveWiki(question));
-                        }
-                        #endregion
-                        #region 2.4补充词条关键词对用内容
-                        else
-                        {
-                            AddWiki(message, messageEvent.Sender.Id, builder);
-                        }
-                        #endregion
-                        break;
-                    case FaceMessage.MsgType:
-                        isReply = false;
-                        break;
-                    case ImageMessage.MsgType:
-                        AddWiki(message, messageEvent.Sender.Id, builder);
-                        isReply = false;
-                        break;
-                    default:
-                        isReply = false;
-                        break;
-                }
+                            builder.AddPlainMessage($"突击{i}：\r\n  星球：{m.node}\r\n  任务：{m.missionType}\r\n  特性：{m.modifier}\r\n");
+                            i++;
+                        });
+                        builder.AddPlainMessage($"boss：{result.boss}\r\n");
+                        builder.AddPlainMessage($"剩余时间：{result.eta}");
+                    }
+                    #endregion
+                    #region 2.5补充词条关键词对用内容
+                    else
+                    {
+                        AddWiki(message, senderId, builder);
+                    }
+                    #endregion
+                    break;
+                case FaceMessage.MsgType:
+                    isReply = false;
+                    break;
+                case ImageMessage.MsgType:
+                    AddWiki(message, senderId, builder);
+                    isReply = false;
+                    break;
+                default:
+                    isReply = false;
+                    break;
             }
-            else
-            {
-                isReply = false;
-            }
-            return builder;
         }
-
-
-        /// <summary>
-        /// 回复消息
-        /// </summary>
-        /// <param name="message">消息链[0]是消息主键,[1]开始是具体消息</param>
-        /// <param name="isReply">是否回复消息</param>
-        /// <param name="isAtSource">是否引用来源消息</param>
-        /// <returns></returns>
-        public IMessageBuilder GetReplyMsg(IFriendMessageEventArgs messageEvent, ref bool isReply, ref bool isAtSource)
-        {
-            isReply = true;
-            isAtSource = false;
-            IMessageBuilder builder = new MessageBuilder();
-            var message = messageEvent.Chain;
-
-            if (message.Length > 1)
-            {
-                var firstMsg = Convert.ToString(message[1]);
-                //Type:Source、Plain、Face、Image
-                switch (message[1].Type)
-                {
-                    case PlainMessage.MsgType:
-                        #region 1.定义正则表达式
-                        var getWikiReg = new Regex($"(?<=(^{GetJsonValue("BotName")}\\s+))([^(\\s)]+)$");//机器人名 词条名
-                        var setWikiReg = new Regex($"(?<=(^{GetJsonValue("WikiCommand:Add")}\\s+))([^(\\s)]+)$");//添加词条 词条名
-                        var removeWikiReg = new Regex($"(?<=(^{GetJsonValue("WikiCommand:Remove")}\\s+))([^(\\s)]+)$");//删除词条 词条名
-                        #endregion
-
-                        #region 2.1查百科
-                        if (getWikiReg.IsMatch(firstMsg))
-                        {
-                            var question = getWikiReg.Match(firstMsg).Value;//词条的关键词
-                            GetWiki(question, builder);
-                        }
-                        #endregion
-                        #region 2.2添加词条关键词
-                        else if (setWikiReg.IsMatch(firstMsg))
-                        {
-                            var question = setWikiReg.Match(firstMsg).Value;
-                            if (!listenCache.ContainsKey(messageEvent.Sender.Id))
-                            {
-                                listenCache.Add(messageEvent.Sender.Id, question);
-                            }
-                        }
-                        #endregion
-                        #region 2.3删除词条
-                        else if (removeWikiReg.IsMatch(firstMsg))
-                        {
-                            var question = removeWikiReg.Match(firstMsg).Value;
-                            builder.AddPlainMessage(RemoveWiki(question));
-                        }
-                        #endregion
-                        #region 2.4补充词条关键词对用内容
-                        else
-                        {
-                            AddWiki(message, messageEvent.Sender.Id, builder);
-                        }
-                        #endregion
-                        break;
-                    case FaceMessage.MsgType:
-                        isReply = false;
-                        break;
-                    case ImageMessage.MsgType:
-                        AddWiki(message, messageEvent.Sender.Id, builder);
-                        isReply = false;
-                        break;
-                    default:
-                        isReply = false;
-                        break;
-                }
-            }
-            else
-            {
-                isReply = false;
-            }
-            return builder;
-        }
-
-        /// <summary>
-        /// 取command.json的值
-        /// </summary>
-        /// <param name="key">键</param>
-        /// <returns></returns>
-        public string GetJsonValue(string key) => _command[key];
 
         /// <summary>
         /// 查百科
@@ -280,7 +204,7 @@ namespace Mirai_GameWiki.Plugin
                 else
                 {
                     //未找到的提示信息
-                    builder.AddPlainMessage(string.Format(GetJsonValue("WikiCommand:NotFound"), GetJsonValue("WikiCommand:Add")));
+                    builder.AddPlainMessage(string.Format(_command["WikiCommand:NotFound"], _command["WikiCommand:Add"]));
                 }
             }
             catch
@@ -336,7 +260,7 @@ namespace Mirai_GameWiki.Plugin
                 }
                 SetWiki(question, answer);
                 //添加欢迎信息
-                builder.AddPlainMessage(string.Format(GetJsonValue("WikiCommand:Thanks"), GetJsonValue("BotName")));
+                builder.AddPlainMessage(string.Format(_command["WikiCommand:Thanks"], _command["BotName"]));
                 //从监听数组里移除掉
                 listenCache.Remove(senderId);
             }

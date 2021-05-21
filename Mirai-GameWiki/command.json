@@ -3,7 +3,14 @@
   "WikiCommand": {
     "Add": "添加词条",
     "Remove": "删除词条",
-    "NotFound": "暂无该词条,请按照[{0}-词条名]的格式添加信息.",
-    "Thanks": "添加成功!感谢您为{0}百科做出的贡献!"
+    "NotFound": "暂无该词条. 请按照 【{0} 空格 词条名】 格式添加信息.",
+    "Thanks": "添加成功,感谢您为{0}百科做出的贡献~~"
+  },
+  "WarframeApi": {
+    "Host": "https://api.warframestat.us/",
+    "sortie": {
+      "regex": "(?<=((wf)?(warframe)?(沃肥)?\\s+))((今日)?突击(任务)?)",
+      "api": "pc/zh/sortie"
+    }
   }
 }

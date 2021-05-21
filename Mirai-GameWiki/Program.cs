@@ -54,9 +54,9 @@ namespace Mirai_GameWiki
                 db = new RedisHelper(_connectionString, _instanceName, _defaultDB).GetDatabase();
                 #endregion
             }
-            catch
+            catch (Exception e)
             {
-
+                Console.WriteLine("配置文件加载异常,请检查[*.json]: \r\n" + e.ToString());
             }
         }
 
