@@ -9,7 +9,7 @@
   "WarframeApi": {
     "Host": "https://api.warframestat.us/",
     "sortie": {
-      "regex": "(?<=((wf)?(warframe)?(沃肥)?\\s+))((今日)?突击(任务)?)",
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((今日)?突击(任务)?)",
       "api": "pc/zh/sortie"
     }
   }
