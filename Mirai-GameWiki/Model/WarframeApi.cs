@@ -44,4 +44,25 @@ namespace Mirai_GameWiki.Model
         public string modifierDescription { get; set; }
     }
     #endregion
+
+    #region 奸商
+    public class VoidTraderModel
+    {
+        public string id { get; set; }
+        public DateTime activation { get; set; }
+        public string startString { get; set; }
+        public DateTime expiry { get; set; }
+        public string active { get; set; }
+        public string character { get; set; }
+        /// <summary>
+        /// 地点
+        /// </summary>
+        public string location { get; set; }
+        public string psId { get; set; }
+        /// <summary>
+        /// 剩余时间
+        /// </summary>
+        public string endString { get; set; }
+    }
+    #endregion
 }

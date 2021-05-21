@@ -8,9 +8,16 @@
   },
   "WarframeApi": {
     "Host": "https://api.warframestat.us/",
+    "command": {
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((查)?指令)"
+    },
     "sortie": {
       "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((今日)?突击(任务)?)",
       "api": "pc/zh/sortie"
+    },
+    "voidTrader": {
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((虚空)?(奸)?商(人)?)",
+      "api": "pc/zh/voidTrader"
     }
   }
 }

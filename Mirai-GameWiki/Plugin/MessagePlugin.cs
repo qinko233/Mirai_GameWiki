@@ -109,7 +109,9 @@ namespace Mirai_GameWiki.Plugin
                     var getWikiReg = new Regex($"(?<=(^{_command["BotName"]}\\s+))([^(\\s)]+)$");//机器人名 词条名
                     var setWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Add"]}\\s+))([^(\\s)]+)$");//添加词条 词条名
                     var removeWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Remove"]}\\s+))([^(\\s)]+)$");//删除词条 词条名
+                    var warframe_command = new Regex(_command["WarframeApi:command:regex"]);//warframe 指令
                     var warframe_sortie = new Regex(_command["WarframeApi:sortie:regex"]);//warframe 突击
+                    var warframe_voidTrader = new Regex(_command["WarframeApi:voidTrader:regex"]);//warframe 突击
                     #endregion
 
                     #region 2.1查百科
@@ -136,7 +138,16 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage(RemoveWiki(question));
                     }
                     #endregion
-                    #region warframe突击
+                    #region 2.4 Warframe
+                    #region 指令帮助
+                    else if (warframe_command.IsMatch(firstMsg))
+                    {
+                        builder.AddPlainMessage($"以【wf、warframe、沃肥】开头\r\n 当前存在以下指令\r\n");
+                        builder.AddPlainMessage($"  1.wf 突击\r\n");
+                        builder.AddPlainMessage($"  2.wf 奸商\r\n");
+                    }
+                    #endregion
+                    #region 突击
                     else if (warframe_sortie.IsMatch(firstMsg))
                     {
                         var url = _command["WarframeApi:Host"] + _command["WarframeApi:sortie:api"];
@@ -151,6 +162,17 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage($"boss：{result.boss}\r\n");
                         builder.AddPlainMessage($"剩余时间：{result.eta}");
                     }
+                    #endregion
+                    #region 奸商
+                    else if (warframe_voidTrader.IsMatch(firstMsg))
+                    {
+                        var url = _command["WarframeApi:Host"] + _command["WarframeApi:voidTrader:api"];
+                        var result = JsonConvert.DeserializeObject<VoidTraderModel>(HttpHelper.Send(url, "get"));
+                        builder.AddPlainMessage($"地点：{result.location}\r\n");
+                        builder.AddPlainMessage($"持续时间：{result.activation.AddHours(8).ToString("MM-dd HH:mm:ss")} -> {result.expiry.AddHours(8).ToString("MM-dd HH:mm:ss")}\r\n");
+                        builder.AddPlainMessage($"剩余：{result.startString}到达，{result.endString}后离开");
+                    }
+                    #endregion
                     #endregion
                     #region 2.5补充词条关键词对用内容
                     else
