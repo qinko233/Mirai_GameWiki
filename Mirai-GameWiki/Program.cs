@@ -6,6 +6,7 @@ using Mirai_GameWiki.Plugin;
 using StackExchange.Redis;
 using System;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Mirai_GameWiki
@@ -88,7 +89,8 @@ namespace Mirai_GameWiki
             Console.WriteLine("服务启动~~");
             while (true)
             {
-                if (Console.In.ReadLine() == "exit")
+                Thread.Sleep(1000);
+                if (await Console.In.ReadLineAsync() == "exit")
                 {
                     return;
                 }
