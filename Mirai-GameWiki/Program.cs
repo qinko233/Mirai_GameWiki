@@ -86,12 +86,9 @@ namespace Mirai_GameWiki
             await session.ConnectAsync(options, Convert.ToInt64(configuration["botQQ"])); //机器人QQ号  
 
             Console.WriteLine("服务启动~~");
-            while (true)
+            if (await Console.In.ReadLineAsync() == "exit")
             {
-                if (await Console.In.ReadLineAsync() == "exit")
-                {
-                    return;
-                }
+                return;
             }
         }
     }
