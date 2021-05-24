@@ -9,7 +9,14 @@
   "WarframeApi": {
     "Host": "https://api.warframestat.us/",
     "command": {
-      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((查)?指令)"
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((查)?指令)",
+      "list": [
+        "wf 突击",
+        "wf 奸商",
+        "wf 昼夜",
+        "wf 入侵",
+        "wf 电波"
+      ]
     },
     "sortie": {
       "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((今日)?突击(任务)?)",
@@ -22,6 +29,14 @@
     "cetusCycle": {
       "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((希图斯)?(地球)?(夜灵)?昼夜(时间)?)",
       "api": "pc/cetusCycle"
+    },
+    "invasions": {
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((土豆)?入侵)",
+      "api": "pc/zh/invasions"
+    },
+    "nightwave": {
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((午夜)?电波(任务)?)",
+      "api": "pc/zh/nightwave"
     }
   }
 }

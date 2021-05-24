@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -113,6 +114,8 @@ namespace Mirai_GameWiki.Plugin
                     var warframe_sortie = new Regex(_command["WarframeApi:sortie:regex"]);//warframe 突击
                     var warframe_voidTrader = new Regex(_command["WarframeApi:voidTrader:regex"]);//warframe 突击
                     var warframe_cetusCycle = new Regex(_command["WarframeApi:cetusCycle:regex"]);//warframe 希图斯昼夜
+                    var warframe_invasions = new Regex(_command["WarframeApi:invasions:regex"]);//warframe 入侵
+                    var warframe_nightwave = new Regex(_command["WarframeApi:nightwave:regex"]);//warframe 午夜电波
                     #endregion
 
                     #region 2.1查百科
@@ -143,11 +146,15 @@ namespace Mirai_GameWiki.Plugin
                     #region 指令帮助
                     else if (warframe_command.IsMatch(firstMsg))
                     {
-                        builder.AddPlainMessage($"以【wf、warframe、沃肥】开头\r\n 当前存在以下指令\r\n");
-                        builder.AddPlainMessage($"  1.wf 突击\r\n");
-                        builder.AddPlainMessage($"  2.wf 奸商\r\n");
-                        builder.AddPlainMessage($"  3.wf 昼夜\r\n");
-                        builder.AddPlainMessage($"  3.wf 入侵\r\n");
+                        builder.AddPlainMessage($"以【wf、warframe、沃肥】开头\r\n 当前存在以下指令：\r\n");
+                        var command_textList = _command.GetSection("WarframeApi:command:list").GetChildren().ToArray();
+                        if (command_textList.Any())
+                        {
+                            command_textList.ToList().ForEach(m =>
+                            {
+                                builder.AddPlainMessage($"  {m.Value}\r\n");
+                            });
+                        }
                     }
                     #endregion
                     #region 突击
@@ -182,7 +189,70 @@ namespace Mirai_GameWiki.Plugin
                         var url = _command["WarframeApi:Host"] + _command["WarframeApi:cetusCycle:api"];
                         var result = JsonConvert.DeserializeObject<CetusCycleModel>(HttpHelper.Send(url, "get"));
                         builder.AddPlainMessage($"当前状态：{(result.isDay ? "白天" : "黑夜")}\r\n");
-                        builder.AddPlainMessage($"剩余时间：{new DateTime((result.expiry.AddHours(8) - DateTime.Now).Ticks).ToString("HH小时mm分钟ss秒")}\r\n");
+                        var time = new DateTime((result.expiry.AddHours(8) - DateTime.Now).Ticks);
+                        builder.AddPlainMessage($"剩余时间：{time.ToString("HH小时mm分钟ss秒")}\r\n");
+                        if(result.isDay && time.Minute < 20)
+                        {
+                            builder.AddPlainMessage($"  距离三傻不足20分钟了,请尽早准备!\r\n");
+                        }
+                    }
+                    #endregion
+                    #region 入侵
+                    else if (warframe_invasions.IsMatch(firstMsg))
+                    {
+                        var url = _command["WarframeApi:Host"] + _command["WarframeApi:invasions:api"];
+                        var str = HttpHelper.Send(url, "get");
+                        var result = JsonConvert.DeserializeObject<List<InvasionsModel>>(str);
+                        bool isTudou = false;
+                        result.ForEach(m =>
+                        {
+                            if (!m.completed)
+                            {
+                                string _msg__ = $"{(int)m.completion}%:{100 - (int)m.completion}%  ";
+                                if (m.attackerReward.countedItems.Any())
+                                {
+                                    var item = m.attackerReward.countedItems.FirstOrDefault();
+                                    _msg__ += $"{item.type} x {item.count}";
+                                    if (new Regex("(催化剂)").IsMatch(item.type))
+                                    {
+                                        isTudou = true;
+                                    }
+                                }
+                                else
+                                {
+                                    _msg__ += "无";
+                                }
+                                _msg__ += " vs ";
+                                if (m.defenderReward.countedItems.Any())
+                                {
+                                    var item = m.defenderReward.countedItems.FirstOrDefault();
+                                    _msg__ += $"{item.type} x {item.count}";
+                                    if (new Regex("(催化剂)").IsMatch(item.type))
+                                    {
+                                        isTudou = true;
+                                    }
+                                }
+                                else
+                                {
+                                    _msg__ += "无";
+                                }
+                                builder.AddPlainMessage(_msg__ + "\r\n");
+                            }
+                        });
+                        if (isTudou) { builder.AddPlainMessage("  有土豆入侵，请尽早打!"); }
+                    }
+                    #endregion
+                    #region 午夜电波
+                    else if (warframe_nightwave.IsMatch(firstMsg))
+                    {
+                        var url = _command["WarframeApi:Host"] + _command["WarframeApi:nightwave:api"];
+                        var result = JsonConvert.DeserializeObject<NightwaveModel>(HttpHelper.Send(url, "get"));
+                        builder.AddPlainMessage($"时间：{result.activation.ToString("yyyy-MM-dd")}->{result.expiry.ToString("yyyy-MM-dd")}，阶段：{result.season}\r\n");
+                        builder.AddPlainMessage("本周任务:\r\n");
+                        result.activeChallenges.ForEach(m =>
+                        {
+                            builder.AddPlainMessage($" {(m.isDaily ? "[日常]" : (m.isElite ? "[精英]" : "[普通]"))}{m.reputation} {m.desc}\r\n");
+                        });
                     }
                     #endregion
                     #endregion
