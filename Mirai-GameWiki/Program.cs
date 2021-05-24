@@ -22,6 +22,12 @@ namespace Mirai_GameWiki
         /// </summary>
         public static void Configure()
         {
+            string _ip = string.Empty;
+            string _port = string.Empty;
+            string _connectionString = string.Empty;
+            string _instanceName = string.Empty;
+            int _defaultDB = 0;
+
             try
             {
                 #region 1.加载配置文件
@@ -41,18 +47,26 @@ namespace Mirai_GameWiki
                 #region 2.配置数据库(redis)连接串
                 var redis = configuration.GetSection("Redis");
                 //连接字符串
-                string _ip = redis.GetSection("Ip").Value;
-                string _port = redis.GetSection("Port").Value;
-                string _connectionString = $"{ _ip}:{_port}";
+                _ip = redis.GetSection("Ip").Value;
+                _port = redis.GetSection("Port").Value;
+                _connectionString = $"{ _ip}:{_port}";
 
                 //实例名称
-                string _instanceName = redis.GetSection("InstanceName").Value;
+                _instanceName = redis.GetSection("InstanceName").Value;
 
                 //默认数据库 
-                int _defaultDB = int.Parse(redis.GetSection("DefaultDB").Value ?? "0");
+                _defaultDB = int.Parse(redis.GetSection("DefaultDB").Value ?? "0");
 
                 db = new RedisHelper(_connectionString, _instanceName, _defaultDB).GetDatabase();
                 #endregion
+            }
+            catch (RedisConnectionException)
+            {
+                Console.WriteLine("redis连接失败,请检查");
+                Console.WriteLine($"Ip:{_ip}  Port:{_port}");
+                Console.WriteLine($"InstanceName:{_instanceName}");
+                Console.WriteLine($"DefaultDB:{_defaultDB}");
+                //Console.WriteLine(e.ToString());
             }
             catch (Exception e)
             {

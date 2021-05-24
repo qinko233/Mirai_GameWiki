@@ -65,4 +65,35 @@ namespace Mirai_GameWiki.Model
         public string endString { get; set; }
     }
     #endregion
+    #region 奸商
+    public class CetusCycleModel
+    {
+        public string id { get; set; }
+        /// <summary>
+        /// 结束时刻
+        /// </summary>
+        public DateTime expiry { get; set; }
+        /// <summary>
+        /// 开始时刻
+        /// </summary>
+        public DateTime activation { get; set; }
+        /// <summary>
+        /// 是否白天 true=是
+        /// </summary>
+        public bool isDay { get; set; }
+        /// <summary>
+        /// 当前状态 day、night
+        /// </summary>
+        public string state { get; set; }
+        /// <summary>
+        /// 剩余时间
+        /// </summary>
+        public string timeLeft { get; set; }
+        public bool isCetus { get; set; }
+        /// <summary>
+        /// 转换剩余时间
+        /// </summary>
+        public string shortString { get; set; }
+    }
+    #endregion
 }

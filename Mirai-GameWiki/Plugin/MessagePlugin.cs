@@ -112,6 +112,7 @@ namespace Mirai_GameWiki.Plugin
                     var warframe_command = new Regex(_command["WarframeApi:command:regex"]);//warframe 指令
                     var warframe_sortie = new Regex(_command["WarframeApi:sortie:regex"]);//warframe 突击
                     var warframe_voidTrader = new Regex(_command["WarframeApi:voidTrader:regex"]);//warframe 突击
+                    var warframe_cetusCycle = new Regex(_command["WarframeApi:cetusCycle:regex"]);//warframe 希图斯昼夜
                     #endregion
 
                     #region 2.1查百科
@@ -145,6 +146,8 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage($"以【wf、warframe、沃肥】开头\r\n 当前存在以下指令\r\n");
                         builder.AddPlainMessage($"  1.wf 突击\r\n");
                         builder.AddPlainMessage($"  2.wf 奸商\r\n");
+                        builder.AddPlainMessage($"  3.wf 昼夜\r\n");
+                        builder.AddPlainMessage($"  3.wf 入侵\r\n");
                     }
                     #endregion
                     #region 突击
@@ -171,6 +174,15 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage($"地点：{result.location}\r\n");
                         builder.AddPlainMessage($"持续时间：{result.activation.AddHours(8).ToString("MM-dd HH:mm:ss")} -> {result.expiry.AddHours(8).ToString("MM-dd HH:mm:ss")}\r\n");
                         builder.AddPlainMessage($"剩余：{result.startString}到达，{result.endString}后离开");
+                    }
+                    #endregion
+                    #region 希图斯昼夜
+                    else if (warframe_cetusCycle.IsMatch(firstMsg))
+                    {
+                        var url = _command["WarframeApi:Host"] + _command["WarframeApi:cetusCycle:api"];
+                        var result = JsonConvert.DeserializeObject<CetusCycleModel>(HttpHelper.Send(url, "get"));
+                        builder.AddPlainMessage($"当前状态：{(result.isDay ? "白天" : "黑夜")}\r\n");
+                        builder.AddPlainMessage($"剩余时间：{new DateTime((result.expiry.AddHours(8) - DateTime.Now).Ticks).ToString("HH小时mm分钟ss秒")}\r\n");
                     }
                     #endregion
                     #endregion

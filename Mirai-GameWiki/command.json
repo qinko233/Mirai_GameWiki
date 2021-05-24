@@ -18,6 +18,10 @@
     "voidTrader": {
       "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((虚空)?(奸)?商(人)?)",
       "api": "pc/zh/voidTrader"
+    },
+    "cetusCycle": {
+      "regex": "(?<=(^(wf)?(warframe)?(沃肥)?\\s+))((希图斯)?(地球)?(夜灵)?昼夜(时间)?)",
+      "api": "pc/cetusCycle"
     }
   }
 }
