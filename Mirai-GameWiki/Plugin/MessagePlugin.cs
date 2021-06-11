@@ -208,7 +208,7 @@ namespace Mirai_GameWiki.Plugin
                         {
                             if (!m.completed)
                             {
-                                string _msg__ = $"{(int)m.completion}%:{100 - (int)m.completion}%  ";
+                                string _msg__ = $"{(int)m.completion}%:{100 - (int)m.completion}% at {m.node} ";
                                 if (m.attackerReward.countedItems.Any())
                                 {
                                     var item = m.attackerReward.countedItems.FirstOrDefault();
@@ -259,7 +259,7 @@ namespace Mirai_GameWiki.Plugin
                     #region 2.5补充词条关键词对用内容
                     else
                     {
-                        AddWiki(message, senderId, builder);
+                        AddWiki(message, senderId, builder, ref isReply);
                     }
                     #endregion
                     break;
@@ -267,8 +267,7 @@ namespace Mirai_GameWiki.Plugin
                     isReply = false;
                     break;
                 case ImageMessage.MsgType:
-                    AddWiki(message, senderId, builder);
-                    isReply = false;
+                    AddWiki(message, senderId, builder, ref isReply);
                     break;
                 default:
                     isReply = false;
@@ -345,7 +344,7 @@ namespace Mirai_GameWiki.Plugin
         /// <param name="message"></param>
         /// <param name="senderId"></param>
         /// <param name="builder"></param>
-        public void AddWiki(IMessageBase[] message, long senderId, IMessageBuilder builder)
+        public void AddWiki(IMessageBase[] message, long senderId, IMessageBuilder builder, ref bool isReply)
         {
             string question;
             if (listenCache.TryGetValue(senderId, out question))
@@ -367,6 +366,10 @@ namespace Mirai_GameWiki.Plugin
                 builder.AddPlainMessage(string.Format(_command["WikiCommand:Thanks"], _command["BotName"]));
                 //从监听数组里移除掉
                 listenCache.Remove(senderId);
+            }
+            else
+            {
+                isReply = false;
             }
         }
 
