@@ -110,7 +110,6 @@ namespace Mirai_GameWiki.Model
         public string node { get; set; }
         public string nodeKey { get; set; }
         public string desc { get; set; }
-
         /// <summary>
         /// 进攻方奖励
         /// </summary>
