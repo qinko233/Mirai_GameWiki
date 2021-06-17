@@ -191,7 +191,7 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage($"当前状态：{(result.isDay ? "白天" : "黑夜")}\r\n");
                         var time = new DateTime((result.expiry.AddHours(8) - DateTime.Now).Ticks);
                         builder.AddPlainMessage($"剩余时间：{time.ToString("HH小时mm分钟ss秒")}\r\n");
-                        if(result.isDay && time.Minute < 20)
+                        if (result.isDay && time.Minute < 20)
                         {
                             builder.AddPlainMessage($"  距离三傻不足20分钟了,请尽早准备!\r\n");
                         }
@@ -206,37 +206,36 @@ namespace Mirai_GameWiki.Plugin
                         bool isTudou = false;
                         result.ForEach(m =>
                         {
+                            //过滤掉已打完的
                             if (!m.completed)
                             {
+                                #region 进攻方
                                 string _msg__ = $"{(int)m.completion}%:{100 - (int)m.completion}% at {m.node} ";
                                 if (m.attackerReward.countedItems.Any())
                                 {
                                     var item = m.attackerReward.countedItems.FirstOrDefault();
                                     _msg__ += $"{item.type} x {item.count}";
-                                    if (new Regex("(催化剂)").IsMatch(item.type))
-                                    {
-                                        isTudou = true;
-                                    }
+                                    isTudou = new Regex("(Orokin)", RegexOptions.IgnoreCase).IsMatch(item.type);
                                 }
                                 else
                                 {
                                     _msg__ += "无";
                                 }
+                                #endregion
                                 _msg__ += " vs ";
+                                #region 防守方
                                 if (m.defenderReward.countedItems.Any())
                                 {
                                     var item = m.defenderReward.countedItems.FirstOrDefault();
                                     _msg__ += $"{item.type} x {item.count}";
-                                    if (new Regex("(催化剂)").IsMatch(item.type))
-                                    {
-                                        isTudou = true;
-                                    }
+                                    isTudou = new Regex("(Orokin)", RegexOptions.IgnoreCase).IsMatch(item.type);
                                 }
                                 else
                                 {
                                     _msg__ += "无";
                                 }
                                 builder.AddPlainMessage(_msg__ + "\r\n");
+                                #endregion
                             }
                         });
                         if (isTudou) { builder.AddPlainMessage("  有土豆入侵，请尽早打!"); }

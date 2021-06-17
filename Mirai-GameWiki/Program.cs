@@ -15,11 +15,12 @@ namespace Mirai_GameWiki
     {
         public static string configJsonFileName = "appsettings.json"; //项目配置文件
         public static string commandJsonFileName = "command.json"; //mirai指令文件
-        public static IDatabase db;
-        public static IConfiguration configuration;
-        public static IConfiguration commandList;
+        public static IDatabase db; //redis数据库实例
+        public static IConfiguration configuration; //包含redis链接、mirai-api访问地址等信息
+        public static IConfiguration commandList; //问答百科的配置
+
         /// <summary>
-        /// 配置
+        /// 初始化，加载配置
         /// </summary>
         public static void Configure()
         {
