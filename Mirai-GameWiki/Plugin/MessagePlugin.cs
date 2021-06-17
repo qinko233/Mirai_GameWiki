@@ -306,7 +306,22 @@ namespace Mirai_GameWiki.Plugin
                 else
                 {
                     //未找到的提示信息
-                    builder.AddPlainMessage(string.Format(_command["WikiCommand:NotFound"], _command["WikiCommand:Add"]));
+                    builder.AddPlainMessage(string.Format(_command["WikiCommand:NotFound"], _command["WikiCommand:Add"]) + "\r\n");
+
+                    #region 相似词汇提醒
+                    //redis模糊查询， redis-cli:keys *{question}*
+                    var redisResult = _db.ScriptEvaluate(LuaScript.Prepare(
+                                    //Redis的keys模糊查询：
+                                    " local res = redis.call('KEYS', @keypattern) return res "), new { @keypattern = $"*{question}*" });
+                    if (!redisResult.IsNull)
+                    {
+                        builder.AddPlainMessage("===以下为相似关键词===\r\n");
+                        foreach (var dic in (string[])redisResult)
+                        {
+                            builder.AddPlainMessage($" {dic}\r\n");
+                        }
+                    }
+                    #endregion
                 }
             }
             catch
