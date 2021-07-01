@@ -38,5 +38,13 @@
       "regex": "(?<=(^(wf|warframe|沃肥)?\\s+))((午夜)?电波(任务)?)",
       "api": "pc/zh/nightwave"
     }
+  },
+  "RandomPicCommand": {
+    "PixivUserIdList": [
+      "62558011"
+    ],
+    "command": {
+      "regex": "^\\s*({0})?来点(涩图|色图|(二(次元|刺螈)+)|(好康(的)?))+\\s*$"
+    }
   }
 }

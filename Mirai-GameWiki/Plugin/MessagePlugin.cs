@@ -103,7 +103,7 @@ namespace Mirai_GameWiki.Plugin
             isReply = true;
             var firstMsg = Convert.ToString(message[1]);
             //Type:Source、Plain、Face、Image
-            switch (message[1].Type)
+            switch (message[1]?.Type)
             {
                 case PlainMessage.MsgType:
                     #region 1.定义正则表达式
@@ -116,6 +116,7 @@ namespace Mirai_GameWiki.Plugin
                     var warframe_cetusCycle = new Regex(_command["WarframeApi:cetusCycle:regex"]);//warframe 希图斯昼夜
                     var warframe_invasions = new Regex(_command["WarframeApi:invasions:regex"]);//warframe 入侵
                     var warframe_nightwave = new Regex(_command["WarframeApi:nightwave:regex"]);//warframe 午夜电波
+                    var randomPicCommandReg = new Regex(string.Format(_command["RandomPicCommand:command:regex"], _command["BotName"]));//随机二次元图片
                     #endregion
 
                     #region 2.1查百科
@@ -255,7 +256,24 @@ namespace Mirai_GameWiki.Plugin
                     }
                     #endregion
                     #endregion
-                    #region 2.5补充词条关键词对用内容
+                    #region 2.5 随机二次元图
+                    else if (randomPicCommandReg.IsMatch(firstMsg))
+                    {
+                        //用GetRandomPixivPicId 方法获取pixiv上图片的数字Id,然后通过代理[https://pixiv.cat/{数字id}.jpg)]获取
+                        var picId = GetRandomPixivPicId();
+                        if (!string.IsNullOrEmpty(picId))
+                        {
+                            var picUrl = string.Format("https://pixiv.cat/{0}.jpg", picId);
+                            builder.AddImageMessage(url: picUrl);
+                        }
+                        else
+                        {
+                            builder.AddPlainMessage("获取失败,请稍后再试!");
+                        }
+                        isReply = true;
+                    }
+                    #endregion
+                    #region 2.6补充词条关键词对用内容
                     else
                     {
                         AddWiki(message, senderId, builder, ref isReply);
@@ -409,6 +427,50 @@ namespace Mirai_GameWiki.Plugin
             {
                 return "";
             }
+        }
+
+
+        public string GetRandomPixivPicId()
+        {
+            List<string> pixivPicIdList = new List<string>();
+            var pixivPicId = string.Empty;
+            #region 1.定义正则表达式
+            var followingRegex = new Regex("(?<=(artworks\\\\\\/))(\\d+)");//用户关注首页获取图片Id
+            #endregion
+            #region 2.从配置文件里的用户数组关注列表里取
+            //pixiv用户Id列表
+            _command.GetSection("RandomPicCommand:PixivUserIdList")
+                   .GetChildren()
+                   .ToList()
+                   .ForEach(m =>
+                   {
+                       if (m != null)
+                       {
+                           var followingUrl = string.Format("https://www.pixiv.net/users/{0}/following", m.Value);
+                           var res = HttpHelper.Send(followingUrl, "get");
+                           var list = followingRegex.Matches(res);
+                           if (list.Any())
+                           {
+                               list.ToList().ForEach(m =>
+                               {
+                                   pixivPicIdList.Add(m.Value);//把图片id加进去
+                               });
+                           }
+
+                       }
+                   });
+            #endregion
+            #region 3.tag里获取
+
+            #endregion
+            #region 4.随机取一张
+            if (pixivPicIdList.Count > 0)
+            {
+                var randomNum = new Random().Next(0, pixivPicIdList.Count);
+                pixivPicId = pixivPicIdList.OrderBy(m => m).ToList()[randomNum];
+            }
+            #endregion
+            return pixivPicId;
         }
 
     }
