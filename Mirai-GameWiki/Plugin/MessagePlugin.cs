@@ -257,23 +257,34 @@ namespace Mirai_GameWiki.Plugin
                     #endregion
                     #endregion
                     #region 2.5 随机二次元图,登录搞不定谷歌的验证(recaptcha_enterprise_score_token), 因此暂未实现
-                    //else if (randomPicCommandReg.IsMatch(firstMsg))
-                    //{
-                    //    //用GetRandomPixivPicId 方法获取pixiv上图片的数字Id,然后通过代理[https://pixiv.cat/{数字id}.jpg)]获取
-                    //    var picId = GetRandomPixivPicId();
-                    //    if (!string.IsNullOrEmpty(picId))
-                    //    {
-                    //        var picUrl = string.Format("https://pixiv.cat/{0}.jpg", picId);
-                    //        builder.AddImageMessage(url: picUrl);
-                    //    }
-                    //    else
-                    //    {
-                    //        builder.AddPlainMessage("获取失败,请稍后再试!");
-                    //    }
-                    //    isReply = true;
-                    //}
+                    else if (randomPicCommandReg.IsMatch(firstMsg))
+                    {
+                        //    //用GetRandomPixivPicId 方法获取pixiv上图片的数字Id,然后通过代理[https://pixiv.cat/{数字id}.jpg)]获取
+                        //    var picId = GetRandomPixivPicId();
+                        //    if (!string.IsNullOrEmpty(picId))
+                        //    {
+                        //        var picUrl = string.Format("https://pixiv.cat/{0}.jpg", picId);
+                        //        builder.AddImageMessage(url: picUrl);
+                        //    }
+                        //    else
+                        //    {
+                        //        builder.AddPlainMessage("获取失败,请稍后再试!");
+                        //    }
+                        //    isReply = true;
+                        using (var db = new MysqlHelper())
+                        {
+                            if (db.users.Any())
+                            {
+                                db.users.ToList().ForEach(m =>
+                                {
+                                    builder.AddPlainMessage($"id={m.Id}, name={m.uname}\r\n");
+                                });
+                            }
+                            isReply = true;
+                        }
+                    }
                     #endregion
-                    #region 2.6补充词条关键词对用内容
+                    #region 2.n 补充词条关键词对用内容
                     else
                     {
                         AddWiki(message, senderId, builder, ref isReply);

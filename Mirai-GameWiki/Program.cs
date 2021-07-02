@@ -61,6 +61,8 @@ namespace Mirai_GameWiki
 
                 db = new RedisHelper(_connectionString, _instanceName, _defaultDB).GetDatabase();
                 #endregion
+
+
             }
             catch (RedisConnectionException)
             {
