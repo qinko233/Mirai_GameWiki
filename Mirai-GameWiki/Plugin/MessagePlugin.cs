@@ -256,22 +256,22 @@ namespace Mirai_GameWiki.Plugin
                     }
                     #endregion
                     #endregion
-                    #region 2.5 随机二次元图
-                    else if (randomPicCommandReg.IsMatch(firstMsg))
-                    {
-                        //用GetRandomPixivPicId 方法获取pixiv上图片的数字Id,然后通过代理[https://pixiv.cat/{数字id}.jpg)]获取
-                        var picId = GetRandomPixivPicId();
-                        if (!string.IsNullOrEmpty(picId))
-                        {
-                            var picUrl = string.Format("https://pixiv.cat/{0}.jpg", picId);
-                            builder.AddImageMessage(url: picUrl);
-                        }
-                        else
-                        {
-                            builder.AddPlainMessage("获取失败,请稍后再试!");
-                        }
-                        isReply = true;
-                    }
+                    #region 2.5 随机二次元图,登录搞不定谷歌的验证(recaptcha_enterprise_score_token), 因此暂未实现
+                    //else if (randomPicCommandReg.IsMatch(firstMsg))
+                    //{
+                    //    //用GetRandomPixivPicId 方法获取pixiv上图片的数字Id,然后通过代理[https://pixiv.cat/{数字id}.jpg)]获取
+                    //    var picId = GetRandomPixivPicId();
+                    //    if (!string.IsNullOrEmpty(picId))
+                    //    {
+                    //        var picUrl = string.Format("https://pixiv.cat/{0}.jpg", picId);
+                    //        builder.AddImageMessage(url: picUrl);
+                    //    }
+                    //    else
+                    //    {
+                    //        builder.AddPlainMessage("获取失败,请稍后再试!");
+                    //    }
+                    //    isReply = true;
+                    //}
                     #endregion
                     #region 2.6补充词条关键词对用内容
                     else
@@ -447,7 +447,7 @@ namespace Mirai_GameWiki.Plugin
                        if (m != null)
                        {
                            var followingUrl = string.Format("https://www.pixiv.net/users/{0}/following", m.Value);
-                           var res = HttpHelper.Send(followingUrl, "get");
+                           var res = PixivHelper.Pixiv(followingUrl, "get");
                            var list = followingRegex.Matches(res);
                            if (list.Any())
                            {

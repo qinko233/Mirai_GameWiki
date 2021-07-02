@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Mirai_GameWiki.Model;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -22,6 +24,7 @@ namespace Mirai_GameWiki.Infrastructure
                 HttpWebRequest request = WebRequest.Create(reqUrl) as HttpWebRequest;
                 request.Method = method.ToUpperInvariant();
                 request.Proxy = null;
+
                 if (!"GET".Equals(request.Method) && !string.IsNullOrEmpty(paramData) && paramData.Length > 0)
                 {
                     request.ContentType = "application/json";
@@ -40,10 +43,16 @@ namespace Mirai_GameWiki.Infrastructure
                     }
                 }
             }
+            catch (WebException ex)
+            {
+                var resp = (HttpWebResponse)ex.Response;
+                return ex.Message;
+            }
             catch (Exception ex)
             {
                 return ex.ToString();
             }
         }
+
     }
 }
