@@ -4,7 +4,7 @@
    "ContextNamespace": "Model.Mysql",
    "DefaultDacpacSchema": null,
    "FilterSchemas": false,
-   "IncludeConnectionString": true,
+   "IncludeConnectionString": false,
    "ModelNamespace": "Model.Mysql",
    "OutputContextPath": "Model\/Mysql",
    "OutputPath": "Model\/Mysql",
@@ -13,6 +13,18 @@
    "SelectedHandlebarsLanguage": 0,
    "SelectedToBeGenerated": 0,
    "Tables": [
+      {
+         "Name": "bookmark",
+         "ObjectType": 0
+      },
+      {
+         "Name": "pixiv",
+         "ObjectType": 0
+      },
+      {
+         "Name": "pxusers",
+         "ObjectType": 0
+      },
       {
          "Name": "users",
          "ObjectType": 0

@@ -18,12 +18,30 @@ namespace Mirai_GameWiki.Model.Mysql
         {
         }
 
+        public virtual DbSet<bookmark> bookmark { get; set; }
+        public virtual DbSet<pixiv> pixiv { get; set; }
+        public virtual DbSet<pxusers> pxusers { get; set; }
         public virtual DbSet<users> users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasCharSet("utf8mb4")
                 .UseCollation("utf8mb4_bin");
+
+            modelBuilder.Entity<bookmark>(entity =>
+            {
+                entity.UseCollation("utf8mb4_0900_ai_ci");
+            });
+
+            modelBuilder.Entity<pixiv>(entity =>
+            {
+                entity.UseCollation("utf8mb4_0900_ai_ci");
+            });
+
+            modelBuilder.Entity<pxusers>(entity =>
+            {
+                entity.UseCollation("utf8mb4_0900_ai_ci");
+            });
 
             modelBuilder.Entity<users>(entity =>
             {

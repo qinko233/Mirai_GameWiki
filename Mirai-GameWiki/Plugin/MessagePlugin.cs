@@ -273,12 +273,19 @@ namespace Mirai_GameWiki.Plugin
                         //    isReply = true;
                         using (var db = new MysqlHelper())
                         {
-                            if (db.users.Any())
+                            if (db.pixiv.Any())
                             {
-                                db.users.ToList().ForEach(m =>
+                                var randomNum = new Random().Next(1, db.pixiv.Count());
+                                var pic = db.pixiv.Where(m => m.id == randomNum).FirstOrDefault();
+                                if (pic != null)
                                 {
-                                    builder.AddPlainMessage($"id={m.Id}, name={m.uname}\r\n");
-                                });
+                                    builder.AddPlainMessage($"作者：{pic.userName}\r\n标题：{pic.title}\r\npid：{pic.pid}\r\n");
+                                    builder.AddImageMessage(url: $"https://pixiv.cat/{pic.pid}.jpg");
+                                }
+                            }
+                            else
+                            {
+                                builder.AddPlainMessage($"糟糕, 作者删库跑路了 QAQ\r\n");
                             }
                             isReply = true;
                         }
