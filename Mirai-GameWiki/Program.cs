@@ -17,7 +17,7 @@ namespace Mirai_GameWiki
         public static string commandJsonFileName = "command.json"; //mirai指令文件
         public static IDatabase db; //redis数据库实例
         public static IConfiguration configuration; //包含redis链接、mirai-api访问地址等信息
-        public static IConfiguration commandList; //问答百科的配置
+        public static IConfiguration commandList; //问答百科的配置 
 
         /// <summary>
         /// 初始化，加载配置
