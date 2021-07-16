@@ -1,4 +1,8 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using InstagramApiSharp.API;
+using InstagramApiSharp.API.Builder;
+using InstagramApiSharp.Classes;
+using InstagramApiSharp.Logger;
+using Microsoft.Extensions.Configuration;
 using Mirai_CSharp;
 using Mirai_CSharp.Extensions;
 using Mirai_CSharp.Models;
@@ -8,6 +12,7 @@ using Mirai_GameWiki.Model;
 using Newtonsoft.Json;
 using StackExchange.Redis;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +27,8 @@ namespace Mirai_GameWiki.Plugin
         public static IConfiguration _configuration;
         public static IConfiguration _command;
         public static Dictionary<long, string> listenCache;
+        public static IInstaApi InstaApi;
+
 
         public MessagePlugin() { }
 
@@ -290,6 +297,55 @@ namespace Mirai_GameWiki.Plugin
                             }
                             isReply = true;
                         }
+                    }
+                    #endregion
+                    #region 2.6 Ins在线随机查询
+                    //后续爬库添加离线版
+                    else if (firstMsg.IndexOf("/ins") > -1)
+                    {
+                        string msg = firstMsg.Replace("/ins", "");
+                        if (string.IsNullOrEmpty(msg))
+                        {
+                            //关注列表随机
+                            Task<ArrayList> al = InstaApiMedia.MediaRandomAsync();
+                            al.Wait();
+
+                            if (al.Result.Count == 2)
+                            {
+                                builder.AddPlainMessage($"Owner:{al.Result[0].ToString()}");
+                                builder.AddImageMessage(url: al.Result[1].ToString());
+                            }
+                            else
+                            {
+                                builder.AddPlainMessage("try again");
+                            }
+                            isReply = true;
+                        }
+                        else
+                        {
+                            //添加查询人UserName
+                            msg = msg.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
+                            Task<ArrayList> al = InstaApiMedia.MediaUserRandomAsync(msg);
+                            al.Wait();
+                            if (al.Result.Count == 2)
+                            {
+                                builder.AddPlainMessage($"Owner:{al.Result[0].ToString()}");
+                                builder.AddImageMessage(url: al.Result[1].ToString());
+                            }
+                            else
+                            {
+                                builder.AddPlainMessage("try again");
+                            }
+                            isReply = true;
+                        }
+                    }
+                    #endregion
+                    #region 2.7 9:00-17:00，仅限郭老板，含[到家了][人呢][来联盟]
+                    else if (DateTime.Now.Hour>8 && DateTime.Now.Hour < 17 && senderId.ToString() == "506717576" && (firstMsg.IndexOf("到家了")>-1 || firstMsg.IndexOf("人呢") > -1 || firstMsg.IndexOf("来联盟") > -1))
+                    {
+                        string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
+                        builder.AddImageMessage(url: url);
+                        isReply = true;
                     }
                     #endregion
                     #region 2.n 补充词条关键词对用内容
