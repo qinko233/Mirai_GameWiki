@@ -301,7 +301,7 @@ namespace Mirai_GameWiki.Plugin
                     #endregion
                     #region 2.6 Ins在线随机查询
                     //后续爬库添加离线版
-                    else if (firstMsg.IndexOf("/ins") > -1)
+                    else if (firstMsg.StartsWith("/ins"))
                     {
                         string msg = firstMsg.Replace("/ins", "");
                         if (string.IsNullOrEmpty(msg))
@@ -324,7 +324,7 @@ namespace Mirai_GameWiki.Plugin
                         else
                         {
                             //添加查询人UserName
-                            msg = msg.Replace("\n", "").Replace(" ", "").Replace("\t", "").Replace("\r", "");
+                            msg = new Regex("\\s").Replace(msg, "");
                             Task<ArrayList> al = InstaApiMedia.MediaUserRandomAsync(msg);
                             al.Wait();
                             if (al.Result.Count == 2)
@@ -340,8 +340,10 @@ namespace Mirai_GameWiki.Plugin
                         }
                     }
                     #endregion
-                    #region 2.7 9:00-17:00，仅限郭老板，含[到家了][人呢][来联盟]
-                    else if (DateTime.Now.Hour>8 && DateTime.Now.Hour < 17 && senderId.ToString() == "506717576" && (firstMsg.IndexOf("到家了")>-1 || firstMsg.IndexOf("人呢") > -1 || firstMsg.IndexOf("来联盟") > -1))
+                    #region 2.7 5:00-23:00，仅限郭老板，含[到家了][人呢][来联盟]
+                    else if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23
+                          && senderId.ToString() == "506717576"
+                          && new Regex("(((在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假))").IsMatch(firstMsg))
                     {
                         string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
                         builder.AddImageMessage(url: url);
