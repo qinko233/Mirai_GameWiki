@@ -135,7 +135,7 @@ namespace Mirai_GameWiki.Plugin
                         builder.AddPlainMessage($" 添加,【添加词条 词条名】触发指令，回复补充\r\n");
                         builder.AddPlainMessage("2. Warframe, 请输入【wf 指令】查询具体内容\r\n");
                         builder.AddPlainMessage($"3. 随机一张p站图(都是我关注哒),以下指令等价\r\n");
-                        builder.AddPlainMessage($" 【{_command["BotName"]}来点二次元】\r\n 【{_command["BotName"]}二次元】\r\n 【来点二次元】");
+                        builder.AddPlainMessage($" 【{_command["BotName"]}来点二次元】\r\n 【{_command["BotName"]}二次元】\r\n 【来点二次元】\r\n");
                         builder.AddPlainMessage($"4. Instagram\r\n");
                         builder.AddPlainMessage($" 【/ins】随机图\r\n");
                         builder.AddPlainMessage($" 【/ins 用户id】指定用户随机图\r\n");
