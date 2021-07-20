@@ -345,14 +345,26 @@ namespace Mirai_GameWiki.Plugin
                         }
                     }
                     #endregion
-                    #region 2.7 5:00-23:00，仅限郭老板，含[到家了][人呢][来联盟]
-                    else if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23
-                          && senderId.ToString() == "506717576"
-                          && new Regex("(((在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假))").IsMatch(firstMsg))
+                    #region 2.7  本条目专门针对郭老板 
+                    else if (senderId == 506717576 && !listenCache.ContainsKey(senderId))
                     {
-                        string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
-                        builder.AddImageMessage(url: url);
                         isReply = true;
+                        //5:00-23:00，仅限郭老板，含[到家了][人呢][来联盟]
+                        if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23 && new Regex("(((在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假))").IsMatch(firstMsg))
+                        {
+                            string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
+                            builder.AddImageMessage(url: url);
+                        }
+                        else if (new Regex("(摸鱼)").IsMatch(firstMsg))
+                        {
+                            builder.AddPlainMessage("这个时间水群?\n");
+                            builder.AddPlainMessage("有人正在摸鱼，是谁我不说\n");
+                            builder.AddAtMessage(senderId);
+                        }
+                        else
+                        {
+                            isReply = false;
+                        }
                     }
                     #endregion
                     #region 2.n 补充词条关键词对用内容
