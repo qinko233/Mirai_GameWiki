@@ -350,15 +350,19 @@ namespace Mirai_GameWiki.Plugin
                     {
                         isReply = true;
                         //5:00-23:00，仅限郭老板，含[到家了][人呢][来联盟]
-                        if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23 && new Regex("(((在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假))").IsMatch(firstMsg))
+                        if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23 && new Regex("((((没|不)+去)|(在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假)|(来呀))").IsMatch(firstMsg))
                         {
                             string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
                             builder.AddImageMessage(url: url);
                         }
                         else if (new Regex("(摸鱼)").IsMatch(firstMsg))
                         {
-                            builder.AddPlainMessage("这个时间水群?\n");
-                            builder.AddPlainMessage("有人正在摸鱼，是谁我不说\n");
+                            builder.AddPlainMessage("有人正在摸，是谁我不说\n");
+                            builder.AddAtMessage(senderId);
+                        }
+                        else if (new Regex("((肾)|(节制)|(危险)|(((se)|(色)|(涩))+图))").IsMatch(firstMsg))
+                        {
+                            builder.AddPlainMessage("你不对劲，你有问题\n");
                             builder.AddAtMessage(senderId);
                         }
                         else
