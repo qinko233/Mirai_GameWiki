@@ -112,11 +112,13 @@ namespace Mirai_GameWiki.Plugin
             //Type:Source、Plain、Face、Image
             switch (message[1]?.Type)
             {
+                case AtMessage.MsgType:
                 case PlainMessage.MsgType:
+                    firstMsg = message[1]?.Type == AtMessage.MsgType ? Convert.ToString(message[2]) : firstMsg;
                     #region 1.定义正则表达式
-                    var getWikiReg = new Regex($"(?<=(^{_command["BotName"]}\\s+))([^(\\s)]+)$");//机器人名 词条名
-                    var setWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Add"]}\\s+))([^(\\s)]+)$");//添加词条 词条名
-                    var removeWikiReg = new Regex($"(?<=(^{_command["WikiCommand:Remove"]}\\s+))([^(\\s)]+)$");//删除词条 词条名
+                    var getWikiReg = new Regex($"(?<=(^\\s+{_command["BotName"]}\\s+))([^(\\s)]+)$");//机器人名 词条名
+                    var setWikiReg = new Regex($"(?<=(^\\s+{_command["WikiCommand:Add"]}\\s+))([^(\\s)]+)$");//添加词条 词条名
+                    var removeWikiReg = new Regex($"(?<=(^\\s+{_command["WikiCommand:Remove"]}\\s+))([^(\\s)]+)$");//删除词条 词条名
                     var warframe_command = new Regex(_command["WarframeApi:command:regex"], RegexOptions.IgnoreCase);//warframe 指令
                     var warframe_sortie = new Regex(_command["WarframeApi:sortie:regex"], RegexOptions.IgnoreCase);//warframe 突击
                     var warframe_voidTrader = new Regex(_command["WarframeApi:voidTrader:regex"], RegexOptions.IgnoreCase);//warframe 突击
@@ -345,7 +347,7 @@ namespace Mirai_GameWiki.Plugin
                     #endregion
                     #region 2.7 5:00-23:00，仅限郭老板，含[到家了][人呢][来联盟]
                     else if (DateTime.Now.Hour >= 5 && DateTime.Now.Hour <= 23
-                          && senderId.ToString() == "506717576"
+                          && senderId.ToString() == "443741497"
                           && new Regex("(((在|到)家(了)?)|人呢|((来|打|玩)?联盟)|((下|落)班)|((放|休|请)假))").IsMatch(firstMsg))
                     {
                         string url = "https://wx2.sinaimg.cn/mw690/e9157a1fgy1grz9hfgx5wj209a0axjrh.jpg";
