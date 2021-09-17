@@ -288,12 +288,19 @@ namespace Mirai_GameWiki.Plugin
                         {
                             if (db.pixiv.Any())
                             {
-                                var randomNum = new Random().Next(1, db.pixiv.Count());
-                                var pic = db.pixiv.Where(m => m.id == randomNum).FirstOrDefault();
-                                if (pic != null)
+                                int tryNum = 5;//自增id删了些图片导致不连续，所以5次查询机会
+                                Model.Mysql.pixiv pic = null;
+                                while (tryNum >= 0)
                                 {
-                                    builder.AddPlainMessage($"作者：{pic.userName}\r\n标题：{pic.title}\r\npid：{pic.pid}\r\n");
-                                    builder.AddImageMessage(url: $"https://pixiv.cat/{pic.pid}.jpg");
+                                    var randomNum = new Random().Next(1, db.pixiv.Count());
+                                    pic = db.pixiv.Where(m => m.id == randomNum).FirstOrDefault();
+                                    if (pic != null)
+                                    {
+                                        builder.AddPlainMessage($"作者：{pic.userName}\r\n标题：{pic.title}\r\npid：{pic.pid}\r\n");
+                                        builder.AddImageMessage(url: $"https://pixiv.cat/{pic.pid}.jpg");
+                                        break;
+                                    }
+                                    tryNum--;
                                 }
                             }
                             else

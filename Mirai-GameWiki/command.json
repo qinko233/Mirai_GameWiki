@@ -8,6 +8,7 @@
   },
   "WarframeApi": {
     "Host": "https://api.warframestat.us/",
+    "MarketImgUrlPrefix": "https://warframe.market/static/assets/",
     "command": {
       "regex": "(?<=(^(wf|warframe|沃肥)?\\s+))((查)?指令)",
       "list": [
